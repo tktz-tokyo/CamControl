@@ -38,4 +38,20 @@ jobs:
       - name: Build app
         run: |
           xcodebuild -project CamControl.xcodeproj -scheme CamControl -configuration Release \
+              -derivedDataPath build/adhoc \
               CODE_SIGN_IDENTITY=- DEVELOPMENT_TEAM= CODE_SIGN_STYLE=Manual build
+
+      # Preserve macOS app permissions and symlinks in the downloadable archive.
+      - name: Package app
+        run: |
+          ditto -c -k --keepParent \
+              build/adhoc/Build/Products/Release/CamControl.app \
+              CamControl-ja.zip
+
+      - name: Upload app
+        uses: actions/upload-artifact@v4
+        with:
+          name: CamControl-ja
+          path: CamControl-ja.zip
+          if-no-files-found: error
+          retention-days: 30
